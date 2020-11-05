@@ -11,7 +11,7 @@
 .mtj.tmp/
 target/
 work/
-.idea/
+.idea/*
 .github/
 .mvn/
 
