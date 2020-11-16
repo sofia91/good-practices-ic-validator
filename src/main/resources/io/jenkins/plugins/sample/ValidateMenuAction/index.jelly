@@ -1,0 +1,39 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:bs="/bootstrap">
+
+    <bs:layout title="Project Statistics" norefresh="true">
+        <st:include it="${it.build}" page="sidepanel.jelly"/>
+        <l:main-panel>
+            <st:adjunct includes="io.jenkins.plugins.bootstrap4"/>
+            <div class="fluid-container">
+                <div class="row py-3">
+                    <div class="col-6">
+                        <j:if test= "${!it.existBuilds}">
+                            Días sin construcción rota: <h1>${it.daysWithoutBrokenBuilds}</h1> días.
+                        </j:if>
+                        <j:if test= "${it.existBuilds}">
+                            Sin builds realizados.
+                        </j:if>
+                    </div>
+                </div>
+
+                <div class="row py-3">
+                    <div class="col">
+                        <j:if test= "${it.maxTimeBuildValidate}">
+                            <div class="alert alert-success" role="alert">
+                                No ha superado el tiempo máximo de build, cumple las buenas prácticas de MF.
+                                Tiempo: ${it.tiempo2} milisegundos.
+                            </div>
+                        </j:if>
+                        <j:if test= "${!it.maxTimeBuildValidate}">
+                            <div class="alert alert-danger" role="alert">
+                                Ha superado el tiempo máximo de build.
+                                Tiempo: ${it.tiempo2} milisegundos.
+                            </div>
+                        </j:if>
+                    </div>
+                </div>
+            </div>
+        </l:main-panel>
+    </bs:layout>
+</j:jelly>

@@ -1,5 +1,5 @@
 package io.jenkins.plugins.sample;
-
+/*
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Label;
@@ -76,3 +76,4 @@ public class HelloWorldBuilderTest {
     }
 
 }
+*/
