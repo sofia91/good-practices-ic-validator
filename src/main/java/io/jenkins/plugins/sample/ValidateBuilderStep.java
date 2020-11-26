@@ -4,6 +4,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -14,18 +15,22 @@ import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-
 import javax.servlet.ServletException;
 import java.io.IOException;
 
 public class ValidateBuilderStep extends Builder implements SimpleBuildStep {
 
-    private final String buildName;
+    public static long maxTimeToBuild;
 
     @DataBoundConstructor
-    public ValidateBuilderStep(String buildName){
+    public ValidateBuilderStep(long maxTimeToBuild){
 
-        this.buildName = buildName;
+        if (maxTimeToBuild == 0){
+            this.maxTimeToBuild = 10;
+        } else {
+            this.maxTimeToBuild = maxTimeToBuild;
+
+        }
     }
 
     @Override
@@ -33,9 +38,7 @@ public class ValidateBuilderStep extends Builder implements SimpleBuildStep {
                         @NonNull FilePath filePath,
                         @NonNull Launcher launcher,
                         @NonNull TaskListener taskListener) throws InterruptedException, IOException {
-
-        taskListener.getLogger().println("Tiempo de build: " + run.getTimestampString());
-        taskListener.getLogger().println("Nombre de build: " + buildName);
+        taskListener.getLogger().println("Tiempo máximo de build configurado: " + maxTimeToBuild);
         taskListener.getLogger().println("Id de build: " + run.number);
     }
 
@@ -51,7 +54,21 @@ public class ValidateBuilderStep extends Builder implements SimpleBuildStep {
 
         @Override
         public String getDisplayName() {
-            return "Assigned name + build id +  build time";
+            return "Validación build rápido";
         }
+
+        public FormValidation doCheckMaxTimeToBuild(@QueryParameter String maxTimeToBuild) {
+            if (Util.fixEmptyAndTrim(maxTimeToBuild) == null) {
+                return FormValidation.error("El valor por defecto será 10 minutos.");
+            }
+
+            try {
+                Long.valueOf(maxTimeToBuild);
+                return FormValidation.ok();
+            } catch (NumberFormatException exception) {
+                return FormValidation.error("El valor debe ser entero.");
+            }
+        }
+
     }
 }
