@@ -12,8 +12,9 @@
     <version>${revision}${changelist}</version>
     <packaging>hpi</packaging>
     <properties>
-        <revision>0.0.1</revision>
-        <changelist>-REALEASE</changelist>
+        <revision>0.0.2</revision>
+        <changelist>-RELEASE</changelist>
+
 
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
         <jenkins.version>2.235.1</jenkins.version>
@@ -58,6 +59,31 @@
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-durable-task-step</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jenkins.plugins</groupId>
+            <artifactId>bootstrap4-api</artifactId>
+            <version>4.5.0-2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>4.1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jenkins.plugins</groupId>
+            <artifactId>font-awesome-api</artifactId>
+            <version>5.13.0-1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jenkins.plugins</groupId>
+            <artifactId>jquery3-api</artifactId>
+            <version>3.5.1-1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jenkins.plugins</groupId>
+            <artifactId>popper-api</artifactId>
+            <version>1.16.0-6</version>
         </dependency>
     </dependencies>
 
