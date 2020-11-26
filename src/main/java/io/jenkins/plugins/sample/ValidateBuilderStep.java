@@ -15,8 +15,7 @@ import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.verb.POST;
-
+import javax.servlet.ServletException;
 import java.io.IOException;
 
 public class ValidateBuilderStep extends Builder implements SimpleBuildStep {
@@ -72,5 +71,4 @@ public class ValidateBuilderStep extends Builder implements SimpleBuildStep {
         }
 
     }
-
 }

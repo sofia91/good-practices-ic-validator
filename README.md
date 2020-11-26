@@ -1,7 +1,7 @@
 # good-practices-ic-validator
 [![Build Status](https://ci.jenkins.io/job/Plugins/job/good-practices-ic-validator-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/good-practices-ic-validator-plugin/job/master/)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/good-practices-ic-validator.svg)]()
-[![GitHub release](https://img.shields.io/github/release/jenkinsci/good-practices-ic-validator-plugin.svg?label=changelog)](https://github.com/sofia91/good-practices-ic-validator/blob/develop/changelog.txt)
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/good-practices-ic-validator-plugin.svg?label=changelog)](https://github.com/sofia91/good-practices-ic-validator/blob/develop/Changelog.txt)
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/good-practices-ic-validator.svg?color=blue)](https://plugins.jenkins.io/good-practices-ic-validator)
 
 
