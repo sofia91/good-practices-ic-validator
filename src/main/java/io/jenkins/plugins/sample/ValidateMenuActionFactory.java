@@ -2,7 +2,6 @@ package io.jenkins.plugins.sample;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
-import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import hudson.model.Project;
 import jenkins.model.TransientActionFactory;
@@ -21,6 +20,10 @@ public class ValidateMenuActionFactory extends TransientActionFactory<Project> {
     @NonNull
     @Override
     public Collection<? extends Action> createFor(@NonNull Project project) {
-        return Collections.singleton(new ValidateMenuAction(project));
+        if (!project.getBuilders().isEmpty()){
+            return Collections.singleton(new ValidateMenuAction(project));
+        } else {
+            return Collections.emptyList();
+        }
     }
 }

@@ -1,21 +1,33 @@
 package io.jenkins.plugins.sample;
 
-import hudson.model.AbstractBuild;
-import hudson.model.Action;
-import hudson.model.Project;
+
+import hudson.Util;
+import hudson.model.*;
+import hudson.util.RunList;
+import io.jenkins.plugins.storage.Constants;
+import io.jenkins.plugins.storage.ReadUtil;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Properties;
 
 public class ValidateMenuAction implements Action {
 
     private Project project;
-    private AbstractBuild<?,?> build;
-    final long maxTimeToBuild = ValidateBuilderStep.maxTimeToBuild;
-
 
     public ValidateMenuAction(Project project) {
         this.project = project;
-        this.build = project.getLastBuild();
+    }
+
+    public long getMaxTimeToBuild (){
+        Properties properties = ReadUtil.getJobProperties(project, Constants.VALIDATE_PROPERTIES);
+        if (properties == null) {
+            System.out.println("No se ha podido leer el fichero");
+        }
+        return Long.valueOf(properties.get(Constants.MAX_TIME_TO_BUILD).toString());
+    }
+
+    public Project getProject() {
+        return project;
     }
 
     public int getBuildStepsCount() {
@@ -28,6 +40,8 @@ public class ValidateMenuAction implements Action {
 
     public boolean getMaxTimeBuildValidate(){
 
+        long maxTimeToBuild = getMaxTimeToBuild();
+
         if(project.getLastBuild().getDuration() <= (maxTimeToBuild*60000) ){
             System.out.println("es true" + project.getLastBuild().getDuration());
             return true;
@@ -39,32 +53,14 @@ public class ValidateMenuAction implements Action {
     }
 
     public String getTiempo2(){
-        /*
-        System.out.println(project.getLastFailedBuild().getTimeInMillis());
-        System.out.println(project.getLastFailedBuild().getTimestamp());
-        System.out.println(project.getLastFailedBuild().getTime());
-        System.out.println(project.getLastFailedBuild().getTimestampString());
-        System.out.println(project.getLastFailedBuild().getTimestampString2());
-        System.out.println(project.getLastFailedBuild().getStartTimeInMillis());
-        System.out.println(project.getLastFailedBuild().getFullDisplayName());
-        System.out.println(project.getLastFailedBuild().getDurationString());
-        System.out.println(project.getLastFailedBuild().getDuration());
-        System.out.println(project.getLastCompletedBuild().getDurationString());
-        System.out.println(project.getLastCompletedBuild().getDuration());
-         */
-
-        //Si build roto no saca ningun mensaje
-      //  System.out.println(project.getLastBuild().getDurationString());
-
-System.out.println(project.getLastBuild().getDuration());
-System.out.println("este es el buil roto:" +project.getLastFailedBuild().getDuration());
-
         Long result = project.getLastBuild().getDuration();
-
         return result.toString();
     }
 
-
+    private long failBuildsCount(){
+        RunList<Run> builds = project.getBuilds().failureOnly();
+        return builds.stream().count();
+    }
 
     public String getDaysWithoutBrokenBuilds(){
         if(project.getLastFailedBuild() != null){
@@ -85,9 +81,62 @@ System.out.println("este es el buil roto:" +project.getLastFailedBuild().getDura
                 :"");
     }
 
-    public AbstractBuild<?,?> getBuild() {
-        return this.build;
+
+    public String getMttr(){
+        final long[] repairCount = {0};
+        final long[] repairTimeSumInMillis = {0};
+        long[] repairTimeAux = {0};
+        RunList<Run> builds = project.getBuilds();
+
+        builds.stream().forEach(build -> {
+                    if(!Result.SUCCESS.equals(build.getResult())){
+                        if(repairTimeAux[0] == 0){
+                            repairTimeAux[0] = build.getStartTimeInMillis();
+                        }
+                    } else {
+                        if(repairTimeAux[0] != 0){
+                            System.out.println("Tiempo auxiliar: " + repairTimeAux[0]);
+                            System.out.println("Tiempo inicio build reparado: " + build.getStartTimeInMillis());
+                            //repairTimeSumInMillis[0] += (build.getStartTimeInMillis() - repairTimeAux[0]);
+                            repairTimeSumInMillis[0] += (repairTimeAux[0] - build.getStartTimeInMillis());
+                            System.out.println("Suma tiempo reparacion: " + repairTimeSumInMillis[0]);
+                            repairCount[0]++;
+                            System.out.println("Contador reparacion: " + repairCount[0]);
+                            repairTimeAux[0] = 0;
+                        }
+                    }
+                }
+        );
+        Long result = null;
+        if(repairCount[0] != 0){
+            result = repairTimeSumInMillis[0] / repairCount[0];
+        }
+        System.out.println("Resultado final MTTR: " + result);
+
+        return result != null? Util.getTimeSpanString(result) :"N/A.";
     }
+
+    public String getMtbf(){
+        Long result = null;
+        if(failBuildsCount() != 0){
+            result = Long.valueOf(daysSince(project.getFirstBuild().getTimestamp()))/
+                    failBuildsCount();
+        }
+
+        return result != null ? result + " días.":"Sin builds erroneos.";
+    }
+
+    public String getMbbf(){
+        long failBuildsCount = failBuildsCount();
+        Long result = null;
+        if(failBuildsCount != 0){
+            result = project.getBuilds().stream().count()/
+                    failBuildsCount;
+
+        }
+        return result != null ? result + " builds.":"Sin builds erroneos.";
+    }
+
 
     @Override
     public String getIconFileName() {
