@@ -37,6 +37,11 @@
                         </j:if>
                     </div>
                 </div>
+                <div class="row py-3">
+                    <div class="col">
+                        <h2>MTBF: ${it.mtbf}</h2>
+                    </div>
+                </div>
             </div>
         </l:main-panel>
     </bs:layout>

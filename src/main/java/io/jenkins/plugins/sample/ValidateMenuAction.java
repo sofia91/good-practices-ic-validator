@@ -2,6 +2,7 @@ package io.jenkins.plugins.sample;
 
 
 import hudson.model.*;
+import hudson.util.RunList;
 import io.jenkins.plugins.storage.Constants;
 import io.jenkins.plugins.storage.ReadUtil;
 import java.util.Calendar;
@@ -55,7 +56,10 @@ public class ValidateMenuAction implements Action {
         return result.toString();
     }
 
-
+    private long failBuildsCount(){
+        RunList<Run> builds = project.getBuilds().failureOnly();
+        return builds.stream().count();
+    }
 
     public String getDaysWithoutBrokenBuilds(){
         if(project.getLastFailedBuild() != null){
@@ -74,6 +78,15 @@ public class ValidateMenuAction implements Action {
                 + project.getLastFailedBuild().getDisplayName()
                 + " hace: " + project.getLastFailedBuild().getTimestampString()
                 :"");
+    }
+
+    public String getMtbf(){
+        Long result = null;
+        if(failBuildsCount() != 0){
+            result = Long.valueOf(daysSince(project.getFirstBuild().getTimestamp()))/
+                    failBuildsCount();
+        }
+        return result != null ? result + " días.":"Sin builds erroneos.";
     }
 
     @Override
