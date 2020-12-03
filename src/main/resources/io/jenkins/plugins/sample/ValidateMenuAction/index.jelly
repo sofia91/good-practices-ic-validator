@@ -2,17 +2,18 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:bs="/bootstrap">
 
     <bs:layout title="Project Statistics" norefresh="true">
-        <st:include it="${it.build}" page="sidepanel.jelly"/>
+        <st:include it="${it.project}" page="sidepanel.jelly"/>
         <l:main-panel>
             <st:adjunct includes="io.jenkins.plugins.bootstrap4"/>
             <div class="fluid-container">
+
                 <div class="row py-3">
                     <div class="col-6">
                         <j:if test= "${!it.existBuilds}">
-                            Días sin construcción rota: <h1>${it.daysWithoutBrokenBuilds}</h1> días.
+                            Días sin construcción rota: <h1>${it.daysWithoutBrokenBuilds}</h1> días.<br/>
                         </j:if>
                         <j:if test= "${it.existBuilds}">
-                            Sin builds realizados.
+                            Sin builds realizados.<br/>
                         </j:if>
                     </div>
                 </div>
@@ -21,14 +22,17 @@
                     <div class="col">
                         <j:if test= "${it.maxTimeBuildValidate}">
                             <div class="alert alert-success" role="alert">
-                                No ha superado el tiempo máximo de build, cumple las buenas prácticas de MF.
-                                Tiempo: ${it.tiempo2} milisegundos.
+                                No ha superado el tiempo máximo de build, cumple las buenas prácticas de MF.<br/>
+                                Tiempo: ${it.tiempo2} milisegundos.<br/>
+                                Tiempo máximo definido: ${it.maxTimeToBuild} minutos.<br/>
                             </div>
                         </j:if>
                         <j:if test= "${!it.maxTimeBuildValidate}">
                             <div class="alert alert-danger" role="alert">
-                                Ha superado el tiempo máximo de build.
-                                Tiempo: ${it.tiempo2} milisegundos.
+                                Ha superado el tiempo máximo de build.<br/>
+                                Tiempo: ${it.tiempo2} milisegundos.<br/>
+                                Tiempo máximo definido: ${it.maxTimeToBuild} minutos.<br/>                               Tiempo máximo definido: ${it.maxTimeToBuild} minutos.
+
                             </div>
                         </j:if>
                     </div>

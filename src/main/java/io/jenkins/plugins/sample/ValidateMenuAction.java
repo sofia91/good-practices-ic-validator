@@ -1,21 +1,31 @@
 package io.jenkins.plugins.sample;
 
-import hudson.model.AbstractBuild;
-import hudson.model.Action;
-import hudson.model.Project;
+
+import hudson.model.*;
+import io.jenkins.plugins.storage.Constants;
+import io.jenkins.plugins.storage.ReadUtil;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Properties;
 
 public class ValidateMenuAction implements Action {
 
     private Project project;
-    private AbstractBuild<?,?> build;
-    final long maxTimeToBuild = ValidateBuilderStep.maxTimeToBuild;
-
 
     public ValidateMenuAction(Project project) {
         this.project = project;
-        this.build = project.getLastBuild();
+    }
+
+    public long getMaxTimeToBuild (){
+        Properties properties = ReadUtil.getJobProperties(project, Constants.VALIDATE_PROPERTIES);
+        if (properties == null) {
+            System.out.println("No se ha podido leer el fichero");
+        }
+        return Long.valueOf(properties.get(Constants.MAX_TIME_TO_BUILD).toString());
+    }
+
+    public Project getProject() {
+        return project;
     }
 
     public int getBuildStepsCount() {
@@ -28,6 +38,8 @@ public class ValidateMenuAction implements Action {
 
     public boolean getMaxTimeBuildValidate(){
 
+        long maxTimeToBuild = getMaxTimeToBuild();
+
         if(project.getLastBuild().getDuration() <= (maxTimeToBuild*60000) ){
             System.out.println("es true" + project.getLastBuild().getDuration());
             return true;
@@ -39,28 +51,7 @@ public class ValidateMenuAction implements Action {
     }
 
     public String getTiempo2(){
-        /*
-        System.out.println(project.getLastFailedBuild().getTimeInMillis());
-        System.out.println(project.getLastFailedBuild().getTimestamp());
-        System.out.println(project.getLastFailedBuild().getTime());
-        System.out.println(project.getLastFailedBuild().getTimestampString());
-        System.out.println(project.getLastFailedBuild().getTimestampString2());
-        System.out.println(project.getLastFailedBuild().getStartTimeInMillis());
-        System.out.println(project.getLastFailedBuild().getFullDisplayName());
-        System.out.println(project.getLastFailedBuild().getDurationString());
-        System.out.println(project.getLastFailedBuild().getDuration());
-        System.out.println(project.getLastCompletedBuild().getDurationString());
-        System.out.println(project.getLastCompletedBuild().getDuration());
-         */
-
-        //Si build roto no saca ningun mensaje
-      //  System.out.println(project.getLastBuild().getDurationString());
-
-System.out.println(project.getLastBuild().getDuration());
-System.out.println("este es el buil roto:" +project.getLastFailedBuild().getDuration());
-
         Long result = project.getLastBuild().getDuration();
-
         return result.toString();
     }
 
@@ -83,10 +74,6 @@ System.out.println("este es el buil roto:" +project.getLastFailedBuild().getDura
                 + project.getLastFailedBuild().getDisplayName()
                 + " hace: " + project.getLastFailedBuild().getTimestampString()
                 :"");
-    }
-
-    public AbstractBuild<?,?> getBuild() {
-        return this.build;
     }
 
     @Override

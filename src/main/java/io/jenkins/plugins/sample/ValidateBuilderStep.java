@@ -11,26 +11,30 @@ import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
+import io.jenkins.plugins.storage.Constants;
+import io.jenkins.plugins.storage.WriteUtil;
 import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.verb.POST;
-
+import java.io.File;
 import java.io.IOException;
+
 
 public class ValidateBuilderStep extends Builder implements SimpleBuildStep {
 
-    public static long maxTimeToBuild;
+    private long maxTimeToBuild;
+
+    public String getMaxTimeToBuild(){
+        return String.valueOf(maxTimeToBuild);
+    }
 
     @DataBoundConstructor
     public ValidateBuilderStep(long maxTimeToBuild){
-
-        if (maxTimeToBuild == 0){
+        if(maxTimeToBuild <= 0){
             this.maxTimeToBuild = 10;
         } else {
             this.maxTimeToBuild = maxTimeToBuild;
-
         }
     }
 
@@ -39,6 +43,11 @@ public class ValidateBuilderStep extends Builder implements SimpleBuildStep {
                         @NonNull FilePath filePath,
                         @NonNull Launcher launcher,
                         @NonNull TaskListener taskListener) throws InterruptedException, IOException {
+
+        File storeFile = new File(run.getParent().getRootDir().getAbsolutePath()
+                + File.separator + Constants.VALIDATE_PROPERTIES);
+        WriteUtil.writeProjectPropertie(storeFile, Constants.MAX_TIME_TO_BUILD, String.valueOf(maxTimeToBuild));
+
         taskListener.getLogger().println("Tiempo máximo de build configurado: " + maxTimeToBuild);
         taskListener.getLogger().println("Id de build: " + run.number);
     }
@@ -62,7 +71,6 @@ public class ValidateBuilderStep extends Builder implements SimpleBuildStep {
             if (Util.fixEmptyAndTrim(maxTimeToBuild) == null) {
                 return FormValidation.error("El valor por defecto será 10 minutos.");
             }
-
             try {
                 Long.valueOf(maxTimeToBuild);
                 return FormValidation.ok();
