@@ -37,12 +37,19 @@
                         </j:if>
                     </div>
                 </div>
-                <div class="row py-3">
+                <div class="row">
                     <div class="col">
-                        <h2>MTBF: ${it.mtbf}</h2>
+                        <h5>MTTR: ${it.mttr}</h5>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col">
-                        <h2>MBBF: ${it.mbbf}</h2>
+                        <h5>MTBF: ${it.mtbf}</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <h5>MBBF: ${it.mbbf}</h5>
                     </div>
                 </div>
             </div>

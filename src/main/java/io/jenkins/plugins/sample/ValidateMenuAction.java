@@ -1,6 +1,7 @@
 package io.jenkins.plugins.sample;
 
 
+import hudson.Util;
 import hudson.model.*;
 import hudson.util.RunList;
 import io.jenkins.plugins.storage.Constants;
@@ -80,12 +81,48 @@ public class ValidateMenuAction implements Action {
                 :"");
     }
 
+
+    public String getMttr(){
+        final long[] repairCount = {0};
+        final long[] repairTimeSumInMillis = {0};
+        long[] repairTimeAux = {0};
+        RunList<Run> builds = project.getBuilds();
+
+        builds.stream().forEach(build -> {
+                    if(!Result.SUCCESS.equals(build.getResult())){
+                        if(repairTimeAux[0] == 0){
+                            repairTimeAux[0] = build.getStartTimeInMillis();
+                        }
+                    } else {
+                        if(repairTimeAux[0] != 0){
+                            System.out.println("Tiempo auxiliar: " + repairTimeAux[0]);
+                            System.out.println("Tiempo inicio build reparado: " + build.getStartTimeInMillis());
+                            //repairTimeSumInMillis[0] += (build.getStartTimeInMillis() - repairTimeAux[0]);
+                            repairTimeSumInMillis[0] += (repairTimeAux[0] - build.getStartTimeInMillis());
+                            System.out.println("Suma tiempo reparacion: " + repairTimeSumInMillis[0]);
+                            repairCount[0]++;
+                            System.out.println("Contador reparacion: " + repairCount[0]);
+                            repairTimeAux[0] = 0;
+                        }
+                    }
+                }
+        );
+        Long result = null;
+        if(repairCount[0] != 0){
+            result = repairTimeSumInMillis[0] / repairCount[0];
+        }
+        System.out.println("Resultado final MTTR: " + result);
+
+        return result != null? Util.getTimeSpanString(result) :"N/A.";
+    }
+
     public String getMtbf(){
         Long result = null;
         if(failBuildsCount() != 0){
             result = Long.valueOf(daysSince(project.getFirstBuild().getTimestamp()))/
                     failBuildsCount();
         }
+
         return result != null ? result + " días.":"Sin builds erroneos.";
     }
 
