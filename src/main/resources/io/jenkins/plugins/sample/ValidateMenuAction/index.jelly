@@ -41,6 +41,9 @@
                     <div class="col">
                         <h2>MTBF: ${it.mtbf}</h2>
                     </div>
+                    <div class="col">
+                        <h2>MBBF: ${it.mbbf}</h2>
+                    </div>
                 </div>
             </div>
         </l:main-panel>

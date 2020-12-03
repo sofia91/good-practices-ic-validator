@@ -89,6 +89,18 @@ public class ValidateMenuAction implements Action {
         return result != null ? result + " días.":"Sin builds erroneos.";
     }
 
+    public String getMbbf(){
+        long failBuildsCount = failBuildsCount();
+        Long result = null;
+        if(failBuildsCount != 0){
+            result = project.getBuilds().stream().count()/
+                    failBuildsCount;
+
+        }
+        return result != null ? result + " builds.":"Sin builds erroneos.";
+    }
+
+
     @Override
     public String getIconFileName() {
         return "document.png";
