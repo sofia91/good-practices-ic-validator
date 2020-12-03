@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add the IC number of days that a project has been without "broken build"
 - Add the IC a message that the build time is < 10min
 - Add the maximum build time configuration parameter
+- Add function mtbf
+- Add function mbbf
+- Add function mttr
 
 ### Changed
 - Add the IC validator report link to the menu within the project

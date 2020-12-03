@@ -37,6 +37,21 @@
                         </j:if>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col">
+                        <h5>MTTR: ${it.mttr}</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <h5>MTBF: ${it.mtbf}</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <h5>MBBF: ${it.mbbf}</h5>
+                    </div>
+                </div>
             </div>
         </l:main-panel>
     </bs:layout>
