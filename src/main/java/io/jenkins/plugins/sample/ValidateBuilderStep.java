@@ -80,5 +80,4 @@ public class ValidateBuilderStep extends Builder implements SimpleBuildStep {
         }
 
     }
-
 }

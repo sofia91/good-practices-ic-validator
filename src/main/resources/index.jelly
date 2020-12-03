@@ -1,4 +1,7 @@
 <?jelly escape-by-default='true'?>
 <div>
-    TODO
+Plugin de validación de buenas prácticas IC de Martin Fowler.
+Especificamente validará las practicas:
+6. Corregir builds fallidos inmediatamente
+7. Obtener build rápido
 </div>
