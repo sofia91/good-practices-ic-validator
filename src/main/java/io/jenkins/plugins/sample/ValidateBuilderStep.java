@@ -24,17 +24,24 @@ import java.io.IOException;
 public class ValidateBuilderStep extends Builder implements SimpleBuildStep {
 
     private long maxTimeToBuild;
+    private long lastNBuilds;
 
     public String getMaxTimeToBuild(){
         return String.valueOf(maxTimeToBuild);
     }
+    public String getLastNBuilds (){
+        return String.valueOf(lastNBuilds);
+    }
 
     @DataBoundConstructor
-    public ValidateBuilderStep(long maxTimeToBuild){
+    public ValidateBuilderStep(long maxTimeToBuild,
+                               long lastNBuilds){
         if(maxTimeToBuild <= 0){
             this.maxTimeToBuild = 10;
+            this.lastNBuilds = 5;
         } else {
             this.maxTimeToBuild = maxTimeToBuild;
+            this.lastNBuilds = lastNBuilds;
         }
     }
 
@@ -46,16 +53,16 @@ public class ValidateBuilderStep extends Builder implements SimpleBuildStep {
 
         File storeFile = new File(run.getParent().getRootDir().getAbsolutePath()
                 + File.separator + Constants.VALIDATE_PROPERTIES);
-        WriteUtil.writeProjectPropertie(storeFile, Constants.MAX_TIME_TO_BUILD, String.valueOf(maxTimeToBuild));
+        WriteUtil.writeProjectPropertie(storeFile, getMaxTimeToBuild(), getLastNBuilds());
 
         taskListener.getLogger().println("Tiempo máximo de build configurado: " + maxTimeToBuild);
+        taskListener.getLogger().println("Número builds exitosos: " + maxTimeToBuild);
         taskListener.getLogger().println("Id de build: " + run.number);
     }
 
     @Symbol("greet")
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
-
 
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> aClass) {
@@ -73,6 +80,18 @@ public class ValidateBuilderStep extends Builder implements SimpleBuildStep {
             }
             try {
                 Long.valueOf(maxTimeToBuild);
+                return FormValidation.ok();
+            } catch (NumberFormatException exception) {
+                return FormValidation.error("El valor debe ser entero.");
+            }
+        }
+
+        public FormValidation doCheckLastNBuilds(@QueryParameter String lastNBuilds) {
+            if (Util.fixEmptyAndTrim(lastNBuilds) == null) {
+                return FormValidation.error("El valor por defecto será 5 minutos.");
+            }
+            try {
+                Long.valueOf(lastNBuilds);
                 return FormValidation.ok();
             } catch (NumberFormatException exception) {
                 return FormValidation.error("El valor debe ser entero.");

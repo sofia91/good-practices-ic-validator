@@ -3,4 +3,7 @@
     <f:entry title="${%Tiempo máximo de build}" field="maxTimeToBuild">
         <f:textbox value="${it.maxTimeToBuild}" default="10"/>
     </f:entry>
+    <f:entry title="${%Máximo de builds correctos}" field="lastNBuilds">
+        <f:textbox value="${it.lastNBuilds}" default="5"/>
+    </f:entry>
 </j:jelly>

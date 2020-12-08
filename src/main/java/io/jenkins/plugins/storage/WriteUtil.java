@@ -11,12 +11,13 @@ public class WriteUtil {
     private static final Logger LOGGER = Logger.getLogger(WriteUtil.class.getName());
     public static final String UTF_8 = "UTF-8";
 
-    public static void writeProjectPropertie(File storeFile, String propertyName, String propertyValue) {
+    public static void writeProjectPropertie(File storeFile, String propertyValue1, String propertyValue2) {
         StringBuilder fileContent = new StringBuilder();
         System.out.println("Escribiendo en fichero properties");
         try {
-            fileContent.insert(0,propertyName).append("=")
-                    .append(propertyValue);
+            fileContent.insert(0,Constants.MAX_TIME_TO_BUILD).append("=")
+                    .append(propertyValue1).append("\n").append(Constants.LAST_N_BUILDS)
+                    .append("=").append(propertyValue2);
             Files.write(fileContent.toString(), storeFile, Charset.forName(UTF_8));
         } catch (IOException e) {
             LOGGER.warning(String.format("store build messages error : %s", e.getMessage()));
