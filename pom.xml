@@ -12,8 +12,8 @@
     <version>${revision}${changelist}</version>
     <packaging>hpi</packaging>
     <properties>
-        <revision>0.0.3</revision>
-        <changelist>-RELEASE</changelist>
+        <revision>0.0.5</revision>
+        <changelist>-SNAPSHOT</changelist>
 
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
         <jenkins.version>2.235.1</jenkins.version>
