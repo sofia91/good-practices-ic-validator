@@ -7,64 +7,92 @@ xmlns:l="/lib/layout" xmlns:bs="/bootstrap" xmlns:f="/lib/form" xmlns:fa="/font-
             <st:adjunct includes="io.jenkins.plugins.bootstrap4"/>
             <div class="fluid-container">
                 <div class="row py-3">
-                   <svg class="bi bi-alert-triangle text-danger" width="32" height="32" fill="currentColor">
-                      <fa:svg-icon name="${it.viewSpeedStatus}" class="fa-svg-icon"/>
-                    </svg>
-                    <div class="col-6">
-                        <j:if test= "${!it.existBuilds}">
-                            Días sin construcción rota: <h1>${it.daysWithoutBrokenBuilds}</h1> días.<br/>
-                        </j:if>
-                        <j:if test= "${it.existBuilds}">
-                            Sin builds realizados.<br/>
-                        </j:if>
-                    </div>
-                </div>
-
-                <div class="row py-3">
                     <div class="col">
                         <j:if test= "${it.maxTimeBuildValidate}">
                             <div class="alert alert-success" role="alert">
                                 No ha superado el tiempo máximo de build, cumple las buenas prácticas de MF.<br/>
-                                Tiempo: ${it.tiempo2} milisegundos.<br/>
-                                Tiempo máximo definido: ${it.maxTimeToBuild} minutos.<br/>
                             </div>
                         </j:if>
                         <j:if test= "${!it.maxTimeBuildValidate}">
                             <div class="alert alert-danger" role="alert">
-                                Ha superado el tiempo máximo de build.<br/>
-                                Tiempo: ${it.tiempo2} milisegundos.<br/>
-                                Tiempo máximo definido: ${it.maxTimeToBuild} minutos.<br/>                               Tiempo máximo definido: ${it.maxTimeToBuild} minutos.
-
+                                El último build ha superado el tiempo máximo definido.
                             </div>
                         </j:if>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
-                        <h5>MTTR: ${it.mttr}</h5>
+                  <div class="col-sm-6 mb-3 mb-md-0">
+                    <div class="card text-white bg-info mb-3">
+                      <div class="card-body">
+                        <h5 class="card-title"><img src="${rootURL}/static/c535d1a7/images/32x32/${it.viewSpeedBuildStatus}"/>  Speed</h5>
+                        <p class="card-text text-white">Estatus de rapidez de los builds.</p>
+                      </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <h5>MTBF: ${it.mtbf}</h5>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="card  border-dark  bg-light mb-3">
+                      <div class="card-body">
+                        <h5 class="card-title"><img src="${rootURL}/static/c535d1a7/images/32x32/${it.viewSpeedRepairBuildStatus}"/>  Repair</h5>
+                        <p class="card-text">Estatus de reparacion de builds.</p>
+                      </div>
                     </div>
+                  </div>
                 </div>
                 <div class="row">
-                    <div class="col">
-                        <h5>MBBF: ${it.mbbf}</h5>
+                  <div class="col-sm-6 mb-3 mb-md-0">
+                    <div class="card  border-success mb-3">
+                      <div class="card-body">
+                            <h5 class="card-title">Días sin construcción rota:
+                            <j:if test= "${!it.existBuilds}">
+                                 <h3>${it.daysWithoutBrokenBuilds}</h3>
+                            </j:if>
+                            <j:if test= "${it.existBuilds}">
+                                Sin builds realizados.
+                            </j:if>
+                            </h5>
+                      </div>
                     </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="card text-white bg-info mb-3">
+                      <div class="card-body">
+                        <h5 class="card-title"> Builds and  parameters</h5>
+                        <p class="card-text text-white">
+                          Tiempo último build: ${it.tiempo2} milisegundos.<br/>
+                          Tiempo máximo definido: ${it.maxTimeToBuild} minutos.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                <br/>
                 <div class="row">
-                     <div class="col">
-                         <h5>Tiempo medio de los últimos ${ it.lastNBuilds } builds:  ${it.averageLastNBuilds}</h5>
-                     </div>
+                  <div class="col-sm-12 mb-3 mb-md-0">
+                    <div class="card">
+                      <div class="card-body">
+                        <h5 class="card-title">Métricas. </h5>
+                        <div class="row">
+                            <div class="col-sm-3 md-3 mb-md-0"><p class="card-text"> MTTR: ${it.mttr} </p></div>
+                            <div class="col-sm-3 md-3 mb-md-0"><p class="card-text"> MTBF: ${it.mtbf} </p></div>
+                            <div class="col-sm-3 md-3 mb-md-0"><p class="card-text"> MBBF: ${it.mbbf} </p></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                <br/>
                 <div class="row">
-                     <div class="col">
-                         <h5>Tiempo medio de los builds exitosos:  ${it.averageAllSuccessBuilds}</h5>
-                     </div>
+                  <div class="col-sm-12 mb-6 mb-md-0">
+                    <div class="card">
+                      <div class="card-body">
+                           <h5 class="card-title">Tiempos promedios. </h5>
+                            <div class="col-sm-6 md-6 mb-md-0"><p class="card-text">Tiempo medio de los últimos ${ it.lastNBuilds } builds:  ${it.averageLastNBuilds} </p></div>
+                            <div class="col-sm-6 md-6 mb-md-0"><p class="card-text">Tiempo medio de los builds exitosos:  ${it.averageAllSuccessBuilds}</p></div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-            </div>
+                </div>
         </l:main-panel>
     </bs:layout>
 </j:jelly>
