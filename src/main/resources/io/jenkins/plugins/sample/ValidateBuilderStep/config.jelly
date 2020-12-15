@@ -3,4 +3,13 @@
     <f:entry title="${%Tiempo máximo de build}" field="maxTimeToBuild">
         <f:textbox value="${it.maxTimeToBuild}" default="10"/>
     </f:entry>
+    <f:entry title="${%Regla para capturar N  builds exitosos rápidos}" field="lastNBuilds">
+        <f:textbox value="${it.lastNBuilds}" default="5"/>
+    </f:entry>
+    <f:entry title="${%Tiempo de reparación build}" field="timeRepairBuilds">
+        <f:textbox value="${it.timeRepairBuilds}" default="25"/>
+    </f:entry>
+    <f:entry title="${%Regla para capturar N  builds reparados}" field="nRepairBuilds">
+        <f:textbox value="${it.nRepairBuilds}" default="5"/>
+    </f:entry>
 </j:jelly>
