@@ -1,98 +1,201 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler"
-xmlns:l="/lib/layout" xmlns:bs="/bootstrap" xmlns:f="/lib/form" xmlns:fa="/font-awesome" >
-    <bs:layout title="Project Statistics" norefresh="true">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:bs="/bootstrap">
+
+    <bs:layout title="Project Statistics" norefresh="false">
         <st:include it="${it.project}" page="sidepanel.jelly"/>
         <l:main-panel>
             <st:adjunct includes="io.jenkins.plugins.bootstrap4"/>
             <div class="fluid-container">
-                <div class="row py-3">
-                    <div class="col">
-                        <j:if test= "${it.maxTimeBuildValidate}">
-                            <div class="alert alert-success" role="alert">
-                                No ha superado el tiempo máximo de build, cumple las buenas prácticas de MF.<br/>
-                            </div>
-                        </j:if>
-                        <j:if test= "${!it.maxTimeBuildValidate}">
-                            <div class="alert alert-danger" role="alert">
-                                El último build ha superado el tiempo máximo definido.
-                            </div>
-                        </j:if>
-                    </div>
-                </div>
-                <div class="row">
-                  <div class="col-sm-6 mb-3 mb-md-0">
-                    <div class="card text-white bg-info mb-3">
-                      <div class="card-body">
-                        <h5 class="card-title"><img src="${rootURL}/static/c535d1a7/images/32x32/${it.viewSpeedBuildStatus}"/>  Speed</h5>
-                        <p class="card-text text-white">Estatus de rapidez de los builds.</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-sm-6">
-                    <div class="card  border-dark  bg-light mb-3">
-                      <div class="card-body">
-                        <h5 class="card-title"><img src="${rootURL}/static/c535d1a7/images/32x32/${it.viewSpeedRepairBuildStatus}"/>  Repair</h5>
-                        <p class="card-text">Estatus de reparacion de builds.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-sm-6 mb-3 mb-md-0">
-                    <div class="card  border-success mb-3">
-                      <div class="card-body">
-                            <h5 class="card-title">Días sin construcción rota:
-                            <j:if test= "${!it.existBuilds}">
-                                 <h3>${it.daysWithoutBrokenBuilds}</h3>
-                            </j:if>
-                            <j:if test= "${it.existBuilds}">
-                                Sin builds realizados.
-                            </j:if>
-                            </h5>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-sm-6">
-                    <div class="card text-white bg-info mb-3">
-                      <div class="card-body">
-                        <h5 class="card-title"> Builds and  parameters</h5>
-                        <p class="card-text text-white">
-                          Tiempo último build: ${it.tiempo2} milisegundos.<br/>
-                          Tiempo máximo definido: ${it.maxTimeToBuild} minutos.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <br/>
-                <div class="row">
-                  <div class="col-sm-12 mb-3 mb-md-0">
-                    <div class="card">
-                      <div class="card-body">
-                        <h5 class="card-title">Métricas. </h5>
-                        <div class="row">
-                            <div class="col-sm-3 md-3 mb-md-0"><p class="card-text"> MTTR: ${it.mttr} </p></div>
-                            <div class="col-sm-3 md-3 mb-md-0"><p class="card-text"> MTBF: ${it.mtbf} </p></div>
-                            <div class="col-sm-3 md-3 mb-md-0"><p class="card-text"> MBBF: ${it.mbbf} </p></div>
+<style>
+
+ .tabs__panel-card {
+   display: -webkit-box;
+   display: flex;
+   margin-bottom: 30px;
+   padding: 15px;
+   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+ }
+ .tabs__panel-card:last-child {
+   margin-bottom: 0;
+ }
+
+ .tabs__panel-card--spaced-between {
+   -webkit-box-pack: justify;
+           justify-content: space-between;
+ }
+
+ .tabs__panel-avatar {
+   flex-shrink: 0;
+   width: 100px;
+   height: 100px;
+   border-radius: 50%;
+   background-color: rgba(0, 0, 0, 0.15);
+ }
+
+ .tabs__panel-img {
+   flex-shrink: 0;
+   width: 80px;
+   height: 80px;
+   border-radius: 4px;
+   background-color: rgba(0, 0, 0, 0.15);
+ }
+
+ .tabs__panel-content {
+   width: 100%;
+   margin-left: 30px;
+ }
+ .tabs__panel-content:first-child {
+   margin-left: 0;
+ }
+ .tabs__panel-content:not(:last-child) {
+   margin-right: 30px;
+ }
+ .link { color:blue; cursor:pointer; display:inline;}
+ .link:hover {color:purple; text-decoration:underline;}
+
+ </style>
+
+<div class="row">
+  <div class="col-sm-12 mb-12 mb-md-12">
+	<svg width="100%" height="350" xmlns="http://www.w3.org/2000/svg" >
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_8" y2="307.24078" x2="392.95463" y1="166.46479" x1="392.95463" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_9" y2="159.11163" x2="559.92104" y1="158.468" x1="401.83526" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_10" y2="25.88192" x2="463.43636" y1="149.53244" x1="397.20303" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_11" y2="76.08442" x2="533.91808" y1="152.09899" x1="400.87209" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_12" y2="287.19237" x2="310.1557" y1="165.67014" x1="387.54756" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_13" y2="231.84089" x2="248.56973" y1="162.91012" x1="382.82477" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_14" y2="287.83599" x2="479.17499" y1="166.02159" x1="396.67828" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_15" y2="29.10002" x2="316.3143" y1="148.54927" x1="387.12775" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_17" y2="82.52063" x2="247.88544" y1="154.22332" x1="381.55693" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_18" y2="234.41538" x2="537.33953" y1="162.66929" x1="399.46158" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <ellipse ry="9.40684" rx="10.52758" id="svg_19" cy="157.16525" cx="391.74375" fill-opacity="null" stroke-opacity="null" stroke-width="1.5" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_20" y2="10.74933" x2="392.27004" y1="28.56401" x1="315.89788" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_21" y2="28.56401" x2="316.50885" y1="83.15741" x1="247.46842" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_23" y2="160.53452" x2="224.97984" y1="82.62234" x1="248.38974" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_24" y2="233.36547" x2="248.56981" y1="158.50203" x1="226.60053" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_25" y2="287.49168" x2="310.21213" y1="232.47683" x1="248.03003" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_26" y2="307.52136" x2="392.26979" y1="287.22462" x1="309.64426" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_27" y2="287.22462" x2="478.87044" y1="306.98724" x1="392.55373" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_28" y2="234.88039" x2="536.22561" y1="286.15637" x1="478.01863" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_29" y2="159.88038" x2="559.50841" y1="233.58959" x1="536.50955" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_30" y2="76.6575" x2="532.22646" y1="158.51159" x1="560.12246" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_31" y2="76.28374" x2="531.51117" y1="25.15296" x1="463.32095" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_32" y2="11.02472" x2="392.98488" y1="25.37722" x1="463.55938" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_35" y2="147.92482" x2="392.61282" y1="11.65154" x1="392.96194" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <line stroke-linecap="null" stroke-linejoin="null" id="svg_36" y2="158.78559" x2="381.13179" y1="157.66299" x1="226.37047" fill-opacity="null" stroke-opacity="null" stroke-width="1" fill="none" stroke="#000"/>
+	  <path fill="#ffffff" stroke-width="1.5" d="m563.00208,162.07857l-171.68974,-0.67452l142.99099,-89.38617l28.69874,90.06068l0.00001,0.00001z" id="svg_3" stroke="#000"/>
+	  <path fill="#ffffff" stroke-width="1.5" d="m542.8712,236.71646l-153.91201,-76.64847l174.13107,2.68293l-20.21905,73.96554l-0.00001,0z" id="svg_5" stroke="#000"/>
+	  <path fill="#ffffff" stroke-width="1.5" d="m534.88856,72.92319l-143.87994,89.96973l77.53296,-145.22558l66.34698,55.25585z" id="svg_6" stroke="#000"/>
+	  <path class="link" fill="#e4edf6" stroke-width="1.5" d="m468.45473,17.5353l-79.40406,149.87864l3.98486,-167.41394l75.4192,17.5353z" id="svg_7" stroke="#000"/>
+	  <path fill="#ffffff" stroke-width="1.5" d="m392.59658,0.03371l-1.9298,168.42859l-81.01278,-150.21755l82.94258,-18.21104z" id="svg_22" stroke="#000"/>
+	  <path fill="#ffffff" stroke-width="1.5" d="m309.30142,18.18803l81.72053,151.06434l-151.12676,-92.32108l69.40623,-58.74325l0,-0.00001z" id="svg_33" stroke="#000"/>
+	  <path fill="#ffffff" stroke-width="1.5" d="m484.86373,295.22028l-92.00221,-135.01192l149.76971,76.63145l-57.7675,58.38047z" id="svg_34" stroke="#000"/>
+	  <path class="link" fill="#e4edf6" d="m393.97599,321.86336l-4.16107,-163.82482l94.69271,137.55466l-90.53164,26.27016z" id="svg_37" stroke="#000"/>
+	  <path fill="#ffffff" stroke-width="1.5" d="m239.95852,76.97698l148.98194,83.69004l-173.4959,3.23987l24.51396,-86.9299l0,-0.00001z" id="svg_38" stroke="#000"/>
+	  <path fill="#ffffff" stroke-width="1.5" d="m216.8853,164.4825l172.70488,-6.28978l-142.71967,91.68895l-29.98521,-85.39917z" id="svg_39" stroke="#000"/>
+	  <path fill="#ffffff" stroke-width="1.5" d="m216.8853,164.4825l172.70488,-6.28978l-142.71967,91.68895l-29.98521,-85.39917z" id="svg_40" stroke="#000"/>
+	  <path fill="#ffffff" stroke-width="1.5" d="m245.44318,250.12272l143.44438,-92.64796l-69.74346,149.94584l-73.70093,-57.29788l0.00001,0z" id="svg_41" stroke="#000"/>
+	  <path fill="#ffffff" stroke-width="1.5" d="m215.73919,164.8385l173.85099,-6.64579l-143.86578,92.04496l-29.98521,-85.39917z" id="svg_42" stroke="#000"/>
+	  <path class="link" fill="#e4edf6" stroke-width="1.5" d="m319.34616,307.74899l69.9273,-150.86477l4.17267,164.53168l-74.09996,-13.66691l-0.00001,0z" id="svg_43" stroke="#000"/>
+	  <text font-style="italic" font-weight="bold" stroke="#000" transform="rotate(-1.420194387435913 403.98767089843824,109.14348602294962) matrix(0.6872081756591797,0,0,0.5350164175033569,126.27503696084023,37.54742428660393) " xml:space="preserve" text-anchor="start" font-family="Oswald, sans-serif" font-size="24" id="svg_1" y="142.04648" x="389.95113" stroke-width="0" fill="#000000">P0</text>
+	  <text font-weight="bold" font-style="italic" stroke="#000" transform="rotate(-1.420194387435913 410.0743103027389,215.89854431152477) matrix(0.6872081756591797,0,0,0.5350164175033569,126.27503696084023,37.54742428660393) " xml:space="preserve" text-anchor="start" font-family="Oswald, sans-serif" font-size="24" id="svg_4" y="341.58674" x="398.80014" stroke-width="0" fill="#000000">P6</text>
+	  <text font-style="italic" font-weight="bold" stroke="#000" transform="rotate(-1.420194387435913 375.25238037109494,215.2241363525378) matrix(0.6872081756591797,0,0,0.5350164175033569,126.27503696084023,37.54742428660393) " xml:space="preserve" text-anchor="start" font-family="Oswald, sans-serif" font-size="24" id="svg_45" y="340.32383" x="347.67252" stroke-width="0" fill="#000000">P7</text>
+	  <path stroke="#000" id="svg_47" d="m380.38237,156.47904l2.53263,-3.9338l4.38631,-2.27134l5.06528,0l4.38634,2.27134l2.53263,3.9338l0,4.54267l-2.53263,3.93377l-4.38634,2.27136l-5.06528,0l-4.38631,-2.27136l-2.53263,-3.93377l0,-4.54267z" stroke-opacity="null" fill="#b2b2b2"/>
+	  <img onClick="dataReception()"  tooltip="${it.statusWeatherJenkins[1]}" src="${rootURL}/static/c535d1a7/images/32x32/${it.statusWeatherJenkins[0]}" style="position: absolute;top: 6%; left: 46%;" class="link mensajeoculto" id="p0" />
+	  <img onClick="dataReception()"  tooltip="${it.viewSpeedRepairBuildStatus[1]}" src="${rootURL}/static/c535d1a7/images/32x32/${it.viewSpeedRepairBuildStatus[0]}" style="position: absolute;top: 70%; left: 47%" class="link" id="p1"/>
+	  <img onClick="dataReception()"  tooltip="${it.viewSpeedBuildStatus[1]}" src="${rootURL}/static/c535d1a7/images/32x32/${it.viewSpeedBuildStatus[0]}" style="position: absolute;top:6%; top: 70%; left: 40.5%;"  class="link" id="p2"/>
+	  <img class="rounded-circle " src="${rootURL}/static/c535d1a7/images/48x48/${it.mediaWeather}" style="background: #ffffff; position: absolute;top: 40%; left: 42%;" />
+	</svg>
+  </div>
+</div>
+
+<script type="text/javascript">
+function dataReception(){
+      var contenedor = document.getElementById("enlace");
+      contenedor.style.display = "block";
+}
+</script>
+        <div  id="enlace"  style="display:none">
+        <div class="col-sm-6 col-md-12">
+        <div class="tabs__panel-card">
+             <img style="flex-shrink: 0;width: 80px;height: 72px;border-radius: 50%;background-color: rgb(2 26 53);" src="${rootURL}/static/c535d1a7/images/48x48/${it.viewSpeedRepairBuildStatus[0]}"/>
+             <div class="tabs__panel-content">
+               <h5 class="card-title"> ${it.dataReception[2]}% -- ${it.dataReception[3]}</h5>
+               Los últimos ${it.dataReception[4]} builds tardaron menos de ${it.dataReception[5]} minutos.<br/>
+             </div>
+        </div>
+        </div>
+        </div>
+            <div class="row py-3">
+                <div class="col">
+                    <j:if test= "${it.maxTimeBuildValidate}">
+                        <div class="alert alert-success" role="alert">
+                            No ha superado el tiempo máximo de build, cumple las buenas prácticas de MF.<br/>
                         </div>
-                      </div>
+                    </j:if>
+                    <j:if test= "${!it.maxTimeBuildValidate}">
+                        <div class="alert alert-danger" role="alert">
+                            El último build ha superado el tiempo máximo definido.
+                        </div>
+                    </j:if>
+                </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-6 mb-3 mb-md-0">
+                <div class="card  border-success mb-3">
+                  <div class="card-body">
+                        <h5 class="card-title">Días sin construcción rota:
+                        <j:if test= "${!it.existBuilds}">
+                             <h3>${it.daysWithoutBrokenBuilds}</h3>
+                        </j:if>
+                        <j:if test= "${it.existBuilds}">
+                            Sin builds realizados.
+                        </j:if>
+                        </h5>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="card text-white bg-info mb-3">
+                  <div class="card-body">
+                    <h5 class="card-title"> Builds and  parameters</h5>
+                    <p class="card-text text-white">
+                      Tiempo último build: ${it.tiempo2} milisegundos.<br/>
+                      Tiempo máximo definido: ${it.maxTimeToBuild} minutos.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <br/>
+            <div class="row">
+              <div class="col-sm-12 mb-3 mb-md-0">
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">Métricas. </h5>
+                    <div class="row">
+                        <div class="col-sm-3 md-3 mb-md-0"><p class="card-text"> MTTR: ${it.mttr} </p></div>
+                        <div class="col-sm-3 md-3 mb-md-0"><p class="card-text"> MTBF: ${it.mtbf} </p></div>
+                        <div class="col-sm-3 md-3 mb-md-0"><p class="card-text"> MBBF: ${it.mbbf} </p></div>
                     </div>
                   </div>
                 </div>
-                <br/>
-                <div class="row">
-                  <div class="col-sm-12 mb-6 mb-md-0">
-                    <div class="card">
-                      <div class="card-body">
-                           <h5 class="card-title">Tiempos promedios. </h5>
-                            <div class="col-sm-6 md-6 mb-md-0"><p class="card-text">Tiempo medio de los últimos ${ it.lastNBuilds } builds:  ${it.averageLastNBuilds} </p></div>
-                            <div class="col-sm-6 md-6 mb-md-0"><p class="card-text">Tiempo medio de los builds exitosos:  ${it.averageAllSuccessBuilds}</p></div>
-                      </div>
-                    </div>
+              </div>
+            </div>
+            <br/>
+            <div class="row">
+              <div class="col-sm-12 mb-6 mb-md-0">
+                <div class="card">
+                  <div class="card-body">
+                       <h5 class="card-title">Tiempos promedios. </h5>
+                        <div class="col-sm-6 md-6 mb-md-0"><p class="card-text">Tiempo medio de los últimos ${ it.lastNBuilds } builds:  ${it.averageLastNBuilds} </p></div>
+                        <div class="col-sm-6 md-6 mb-md-0"><p class="card-text">Tiempo medio de los builds exitosos:  ${it.averageAllSuccessBuilds}</p></div>
                   </div>
                 </div>
-                </div>
+              </div>
+            </div>
+            </div>
         </l:main-panel>
     </bs:layout>
 </j:jelly>
