@@ -17,8 +17,6 @@ import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-
-import javax.sound.midi.SysexMessage;
 import java.io.File;
 import java.io.IOException;
 
@@ -44,7 +42,9 @@ public class ValidateBuilderStep extends Builder implements SimpleBuildStep {
 
     @DataBoundConstructor
     public ValidateBuilderStep(long maxTimeToBuild,
-                               long lastNBuilds, long timeRepairBuilds){
+                               long lastNBuilds,
+                               long timeRepairBuilds,
+                               long nRepairBuilds){
         if(maxTimeToBuild <= 0){
             this.maxTimeToBuild = 10;
             this.lastNBuilds = 5;
@@ -54,7 +54,7 @@ public class ValidateBuilderStep extends Builder implements SimpleBuildStep {
             this.maxTimeToBuild = maxTimeToBuild;
             this.lastNBuilds = lastNBuilds;
             this.timeRepairBuilds= timeRepairBuilds;
-            this.nRepairBuilds=nRepairBuilds;
+            this.nRepairBuilds= nRepairBuilds;
         }
     }
 

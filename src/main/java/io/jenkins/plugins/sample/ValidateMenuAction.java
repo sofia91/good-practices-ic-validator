@@ -4,29 +4,26 @@ package io.jenkins.plugins.sample;
 import hudson.Util;
 import hudson.model.*;
 import hudson.util.RunList;
-import io.jenkins.plugins.fontawesome.api.SvgTag;
 import io.jenkins.plugins.storage.Constants;
 import io.jenkins.plugins.storage.ReadUtil;
-import org.apache.commons.collections.iterators.ArrayListIterator;
-import org.apache.commons.collections.iterators.ListIteratorWrapper;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class ValidateMenuAction implements Action {
 
     private Project project;
+    private String style;
 
     public ValidateMenuAction(Project project) {
         this.project = project;
+        this.style = "display:none;";
     }
 
     public long getMaxTimeToBuild (){
         Properties properties = ReadUtil.getJobProperties(project, Constants.VALIDATE_PROPERTIES);
         if (properties == null) {
-            System.out.println("No se ha podido leer el fichero");
+            //  System.out.println("No se ha podido leer el fichero");
         }
         return Long.valueOf(properties.get(Constants.MAX_TIME_TO_BUILD).toString());
     }
@@ -34,7 +31,7 @@ public class ValidateMenuAction implements Action {
     public long getLastNBuilds(){
         Properties properties = ReadUtil.getJobProperties(project, Constants.VALIDATE_PROPERTIES);
         if (properties == null) {
-            System.out.println("No se ha podido leer el fichero");
+            // System.out.println("No se ha podido leer el fichero");
         }
         return Long.valueOf(properties.get(Constants.LAST_N_BUILDS).toString());
     }
@@ -42,7 +39,7 @@ public class ValidateMenuAction implements Action {
     public long getTimeRepairBuilds(){
         Properties properties = ReadUtil.getJobProperties(project, Constants.VALIDATE_PROPERTIES);
         if (properties == null) {
-            System.out.println("No se ha podido leer el fichero");
+            // System.out.println("No se ha podido leer el fichero");
         }
         return Long.valueOf(properties.get(Constants.TIME_REPAIR_BUILDS).toString());
     }
@@ -50,7 +47,7 @@ public class ValidateMenuAction implements Action {
     public long getNRepairBuilds(){
         Properties properties = ReadUtil.getJobProperties(project, Constants.VALIDATE_PROPERTIES);
         if (properties == null) {
-            System.out.println("No se ha podido leer el fichero");
+            //  System.out.println("No se ha podido leer el fichero");
         }
         return Long.valueOf(properties.get(Constants.N_REPAIR_BUILDS).toString());
     }
@@ -79,6 +76,7 @@ public class ValidateMenuAction implements Action {
             return false;
 
         }
+
     }
 
     public String getTiempo2(){
@@ -140,7 +138,7 @@ public class ValidateMenuAction implements Action {
             result = repairTimeSumInMillis[0] / repairCount[0];
         }
         System.out.println("Resultado final MTTR: " + Util.getTimeSpanString(result));
-        return result != null? Util.getTimeSpanString(result) :"N/A.";
+        return result != null? Util.getTimeSpanString(result) + " dÃ­as." : "Sin builds erroneos.";
     }
 
     public String getMtbf(){
@@ -150,7 +148,7 @@ public class ValidateMenuAction implements Action {
                     failBuildsCount();
         }
 
-        return result != null ? result + " días.":"Sin builds erroneos.";
+        return result != null ? result + " dÃ­as.":"Sin builds erroneos.";
     }
 
     public String getMbbf(){
@@ -206,7 +204,7 @@ public class ValidateMenuAction implements Action {
     }
     @Override
     public String getIconFileName() {
-        return "document.png";
+        return getMediaWeather();
     }
 
     @Override
@@ -244,7 +242,7 @@ public class ValidateMenuAction implements Action {
                     if(!Result.SUCCESS.equals(build.getResult())){
                         if(repairTimeAux[0] == 0){
                             repairTimeAux[0] = build.getStartTimeInMillis();
-                            System.out.println("0 - repairTimeAux[0]: "+ repairTimeAux[0]);
+                            // System.out.println("0 - repairTimeAux[0]: "+ repairTimeAux[0]);
                         }
                     } else {
                         if(repairTimeAux[0] != 0){
@@ -252,9 +250,9 @@ public class ValidateMenuAction implements Action {
                             repairTimeList.add(repairTimeSumInMillis[0]);
                             repairCount[0]++;
                             repairTimeAux[0] = 0;
-                            System.out.println("1 - repairCount[0]: "+ repairCount[0]);
-                            System.out.println("2 - repairTimeAux[0]: "+ repairTimeAux[0]);
-                            System.out.println("3 - repairTimeSumInMillis[0]: "+ repairTimeSumInMillis[0]);
+                            //    System.out.println("1 - repairCount[0]: "+ repairCount[0]);
+                            //    System.out.println("2 - repairTimeAux[0]: "+ repairTimeAux[0]);
+                            //    System.out.println("3 - repairTimeSumInMillis[0]: "+ repairTimeSumInMillis[0]);
                         }
                     }
                 }
@@ -263,89 +261,120 @@ public class ValidateMenuAction implements Action {
         return repairTimeList;
     }
 
-    public String getViewSpeedBuildStatus(){
+    public List<String> getViewSpeedBuildStatus() {
+        List<String> array = new ArrayList<String>();
         List<Run> completedBuildList = listBuildsSuccesfully().stream().limit(getLastNBuilds()).collect(Collectors.toList());
-        long maxTime = getMaxTimeToBuild()*60000;
-        double valueInc = (getLastNBuilds()/5);
-        double cont = 0, formula=0.0;
-        for (Run build:completedBuildList) {
-            System.out.println(build.getDuration() );
-            if(build.getDuration() > maxTime){
-                cont=cont + valueInc;
+        long maxTime = getMaxTimeToBuild() * 60000;
+        double cont = 0;
+        long result = 0;
+        String description = "";
+        if ( getLastNBuilds() != 0 ) {
+            for (Run build : completedBuildList) {
+                if (build.getDuration() > maxTime) {
+                    cont++;
+                }
             }
+            result = (long) (((getLastNBuilds() - cont) * 100) / getLastNBuilds());
+            description = "Estabilidad: " + (long)cont + " de los " + getLastNBuilds() + " builds no cumplen la practica 7:\"Obtener un build rÃ¡pido - M.F\"";
+        }else{
+            array.add("");
         }
-        System.out.println("Total builds superan tiempo max: " + cont);
-        formula = ((valueInc*getLastNBuilds())/5);
-        return  getGenerateWeather(cont,formula);
-        /*
-        if( cont <= ((valueInc*getLastNBuilds())/5)*1 ) {
-            healthy = "health-80plus.gif";
-            System.out.println("sol " + cont + "" + ((valueInc*getLastNBuilds())/5)*1 );
-        }
-        else if( cont <= ((valueInc*getLastNBuilds())/5)*2 ){
-            healthy="health-60to79.gif";
-            System.out.println("sol nubes " + cont + "" + ((valueInc*getLastNBuilds())/5)*2 );
-        }
-        else if( cont <= ((valueInc*getLastNBuilds())/5)*3){
-            healthy="health-40to59.gif";
-            System.out.println("nubes " + + cont + "" + ((valueInc*getLastNBuilds())/5)*3);
-        }
-        else if( cont <= ((valueInc*getLastNBuilds())/5)*4 ){
-            healthy="health-20to39.gif";
-            System.out.println("nubes lluvia " + + cont + "" + ((valueInc*getLastNBuilds())/5)*4);
-        }
-        else if(cont <= ((valueInc*getLastNBuilds())/5)*5 ){
-            healthy="health-00to19.gif";
-            System.out.println("nubes truenos" + cont + "" + ((valueInc*getLastNBuilds())/5)*5);
-        }
-        return healthy;
-         */
+
+        String tabla = "<div data-placement=\"right\"><table><thead><tr style=\"background: #fdffce;border: 2px solid #fcffc4;padding:2%;\"><th scope=\"col\">%</th><th scope=\"col\">Description</th></tr></thead><tbody><tr style=\"background: #ffffff;\"><td>"+result +"</td><td>"+description+"</td></tr></tbody></table></div>";
+        String titlePractise="PrÃ¡ctica 7: Obtener build rÃ¡pido - M.F";
+
+        array.add(getGenerateWeather(result));//imagen
+        array.add(tabla); //tabla
+        array.add(String.valueOf(result));//score
+        array.add(titlePractise); //titulo de la practica
+        array.add(String.valueOf(getNRepairBuilds() - cont)); //numero de builds que no superan el maximo
+        array.add(String.valueOf(getMaxTimeToBuild())); //tiempo maximo de reaparaciÃ³n
+        return array;
+
+
     }
-
-
-
-    public String getViewSpeedRepairBuildStatus(){
-        List <Long> timeList= getTimeBetweenRepairs();
-        double time = getTimeRepairBuilds()*60.000;
+    public List<String> getViewSpeedRepairBuildStatus() {
+        List<String> array = new ArrayList<String>();
+        List<Long> timeList = getTimeBetweenRepairs();
         Collections.reverse(timeList);
-        List<Long> lista =  timeList.stream().limit(getNRepairBuilds()).collect(Collectors.toList());
-        double valueInc = (getNRepairBuilds()/5);
-        double cont = 0, formula=0.0;
-        for(Long value: lista ) {
-            System.out.println("value: " + value);
-            if (value > time) {
-                cont = cont + valueInc;
+        List<Long> list = timeList.stream().limit(getNRepairBuilds()).collect(Collectors.toList());
+        double time = getTimeRepairBuilds() * 60.000, cont = 0;
+        String description = "";
+        long result = 0;
+
+        if (getNRepairBuilds() != 0) {
+            for (Long value : list) {
+                System.out.println("value: " + value);
+                if (value > time) {
+                    cont++;
+                }
             }
+            result = (long) (((getNRepairBuilds() - cont) * 100) / getNRepairBuilds());
+            description = "Estabilidad: " + (long)cont + " de los " + getNRepairBuilds() + " builds no cumplen la practica 6: \"Corregir builds fallidos - M.F\"";
         }
-        formula = ((valueInc*getLastNBuilds())/5);
-        System.out.println("Time 25 y nBuilds 5 --> cont : " + cont);
-        System.out.println("Time 25 y nBuilds 5 --> formula : " + formula);
-        return  getGenerateWeather(cont,formula);
+        else{
+            array.add("");
+        }
+        String tabla = "<div data-placement=\"right\"><table><thead><tr style=\"background: #fdffce;border: 2px solid #fcffc4;padding:2%;\"><th scope=\"col\">%</th><th scope=\"col\">Description</th></tr></thead><tbody><tr style=\"background: #ffffff;\"><td>"+result +"</td><td>"+description+"</td></tr></tbody></table></div>";
+        String titlePractise="PrÃ¡ctica 6: Reparar builds fallidos immediatamente - M.F";
+        String cardTitle = String.valueOf(result) + titlePractise;
+        String texto = "" ;
+        array.add(getGenerateWeather(result));//imagen
+        array.add(tabla);//tabla
+        array.add(cardTitle); //titulo con score
+        array.add(titlePractise); //titulo de la practica
+        array.add(String.valueOf((getNRepairBuilds() - cont))); //numero de builds que no superan el maximo
+        array.add(String.valueOf(getTimeRepairBuilds())); //tiempo maximo de reaparaciÃ³n
+        return array;
     }
 
-    public String getGenerateWeather( double value1,double value2 ){
+    public List<String> getStatusWeatherJenkins(){
 
+        List<String> lista = new ArrayList<String>();
+        HealthReport report = project.getBuildHealth();
+        String[] getImage= report.getIconClassName().split("-");
+        String icono = getImage[1]+"-"+getImage[2]+".gif";
+        String tabla = "<div data-placement=\"right\"><table><thead><tr style=\"background: #fdffce;border: 2px solid #fcffc4;\"><th scope=\"col\">%</th><th scope=\"col\">Description</th></tr></thead><tbody><tr style=\"background: #ffffff;\"><td>"+report.getScore() +"</td><td>"+report.getDescription()+"</td></tr></tbody></table></div>";
+        String titlePractice ="Estatus del proyecto (Jenkins)";
+        lista.add(icono); //Nombre icono image
+        lista.add(tabla); //tabla
+        lista.add(String.valueOf(report.getScore()));//score
+        lista.add(titlePractice);//Nombre de la practica
+
+
+        //  lista.add(String.valueOf(report.getScore())); //% weather
+        //   lista.add(report.getDescription()); //description
+        return lista;
+    }
+
+    public String getMediaWeather(){
+        double p0 = Double.parseDouble(getStatusWeatherJenkins().get(2));
+        double p1 = Double.parseDouble(getViewSpeedRepairBuildStatus().get(2));
+        double p2 = Double.parseDouble(getViewSpeedBuildStatus().get(2));
+        double sumTotal = (p0+p1+p2)/3;
+        System.out.println("total" + sumTotal +"p0, p1, p2 : "+ p0 );
+        String result = getGenerateWeather(sumTotal);
+
+        return result;
+    }
+
+    public String getGenerateWeather( double score ){
         String healthy = "";
-        if( value1 <= value2*1) {
-            healthy = "health-80plus.gif";
-        }
-        else if( value1 <= value2*2){
-            healthy="health-60to79.gif";
-        }
-        else if( value1 <= value2*3){
-            healthy="health-40to59.gif";
-        }
-        else if( value1 <= value2*4){
-            healthy="health-20to39.gif";
-        }
-        else if( value1 <= value2*5){
+
+        if (score <= 20) {
             healthy="health-00to19.gif";
+        } else if (score <= 40) {
+            healthy="health-20to39.gif";
+        } else if (score <= 60) {
+            healthy="health-40to59.gif";
+        } else if (score <= 80) {
+            healthy="health-60to79.gif";
+        } else {
+            healthy = "health-80plus.gif";
         }
         return healthy;
     }
 
-    public String getSvgTest(){
-        return SvgTag.fontAwesomeSvgIcon("sun").render();
 
-    }
+
 }
