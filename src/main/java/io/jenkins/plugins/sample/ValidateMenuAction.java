@@ -6,6 +6,7 @@ import hudson.model.*;
 import hudson.util.RunList;
 import io.jenkins.plugins.storage.Constants;
 import io.jenkins.plugins.storage.ReadUtil;
+import jenkins.model.Jenkins;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ public class ValidateMenuAction implements Action {
 
     private Project project;
     private String style;
+    private String rootImage = "/jenkins"+Jenkins.RESOURCE_PATH+"/images/48x48/";
 
     public ValidateMenuAction(Project project) {
         this.project = project;
@@ -138,7 +140,7 @@ public class ValidateMenuAction implements Action {
             result = repairTimeSumInMillis[0] / repairCount[0];
         }
         System.out.println("Resultado final MTTR: " + Util.getTimeSpanString(result));
-        return result != null? Util.getTimeSpanString(result) + " dÃ­as." : "Sin builds erroneos.";
+        return result != null? Util.getTimeSpanString(result) + "." : "Sin builds erroneos.";
     }
 
     public String getMtbf(){
@@ -148,7 +150,7 @@ public class ValidateMenuAction implements Action {
                     failBuildsCount();
         }
 
-        return result != null ? result + " dÃ­as.":"Sin builds erroneos.";
+        return result != null ? result + " d\u00edas.":"Sin builds erroneos.";
     }
 
     public String getMbbf(){
@@ -275,23 +277,31 @@ public class ValidateMenuAction implements Action {
                 }
             }
             result = (long) (((getLastNBuilds() - cont) * 100) / getLastNBuilds());
-            description = "Estabilidad: " + (long)cont + " de los " + getLastNBuilds() + " builds no cumplen la practica 7:\"Obtener un build rÃ¡pido - M.F\"";
+            description = "Estabilidad: " + (long)cont + " de los " + getLastNBuilds() + " builds no cumplen la pr\u00e1ctica 7";
         }else{
             array.add("");
         }
 
         String tabla = "<div data-placement=\"right\"><table><thead><tr style=\"background: #fdffce;border: 2px solid #fcffc4;padding:2%;\"><th scope=\"col\">%</th><th scope=\"col\">Description</th></tr></thead><tbody><tr style=\"background: #ffffff;\"><td>"+result +"</td><td>"+description+"</td></tr></tbody></table></div>";
-        String titlePractise="PrÃ¡ctica 7: Obtener build rÃ¡pido - M.F";
+        String cardTitle = result+"% -- " + "Pr\u00e1ctica 7: Obtener build r\u00e1pido - M.F";
+        String texto = "Los \u00faltimos "+ Long.valueOf((long) (getLastNBuilds() - cont)) + " builds tardaron menos de "+getMaxTimeToBuild() +" min.";
+        String icono  = rootImage+getGenerateWeather(result);
+        String lastBuild = "Tiempo \u00faltimo build: " + getTiempo2() + " milisegundos.";
+        String max = "Tiempo m\u00e1ximo definido: " + getMaxTimeToBuild() + " minutos.";
+        String meanUltimos = "Tiempo medio de los \u00falltimos " + getLastNBuilds() + " builds: " + getAverageLastNBuilds();
+        String meanExistosos = "Tiempo medio de los builds exitosos: " + getAverageAllSuccessBuilds()+ " minutos.";
 
-        array.add(getGenerateWeather(result));//imagen
+        array.add(icono);//imagen
         array.add(tabla); //tabla
-        array.add(String.valueOf(result));//score
-        array.add(titlePractise); //titulo de la practica
-        array.add(String.valueOf(getNRepairBuilds() - cont)); //numero de builds que no superan el maximo
-        array.add(String.valueOf(getMaxTimeToBuild())); //tiempo maximo de reaparaciÃ³n
+        array.add(cardTitle); //titulo con score
+        array.add(texto); //numero de builds que no superan el maximo + tiempo maximo de reaparaciÃ³n
+        array.add(String.valueOf(result));
+        array.add(lastBuild);//Tiempo último build
+        array.add(max);//Tiempo máximo definido
+        array.add(meanUltimos);//Tiempo máximo definido
+        array.add(meanExistosos);//Tiempo máximo definido
+
         return array;
-
-
     }
     public List<String> getViewSpeedRepairBuildStatus() {
         List<String> array = new ArrayList<String>();
@@ -300,6 +310,7 @@ public class ValidateMenuAction implements Action {
         List<Long> list = timeList.stream().limit(getNRepairBuilds()).collect(Collectors.toList());
         double time = getTimeRepairBuilds() * 60.000, cont = 0;
         String description = "";
+        String sinContruccionRota, mttr, mtbf, mbbf= "";
         long result = 0;
 
         if (getNRepairBuilds() != 0) {
@@ -310,21 +321,35 @@ public class ValidateMenuAction implements Action {
                 }
             }
             result = (long) (((getNRepairBuilds() - cont) * 100) / getNRepairBuilds());
-            description = "Estabilidad: " + (long)cont + " de los " + getNRepairBuilds() + " builds no cumplen la practica 6: \"Corregir builds fallidos - M.F\"";
+            description = "Estabilidad: " + (long)cont + " de los " + getNRepairBuilds() + " builds no cumplen la pr\u00e1ctica 6";
         }
         else{
             array.add("");
         }
         String tabla = "<div data-placement=\"right\"><table><thead><tr style=\"background: #fdffce;border: 2px solid #fcffc4;padding:2%;\"><th scope=\"col\">%</th><th scope=\"col\">Description</th></tr></thead><tbody><tr style=\"background: #ffffff;\"><td>"+result +"</td><td>"+description+"</td></tr></tbody></table></div>";
-        String titlePractise="PrÃ¡ctica 6: Reparar builds fallidos immediatamente - M.F";
-        String cardTitle = String.valueOf(result) + titlePractise;
-        String texto = "" ;
-        array.add(getGenerateWeather(result));//imagen
+        String cardTitle = result +"% -- " + "Pr\u00e1ctica 6: Reparar builds fallidos immediatamente - M.F";
+        String desc = "Los \u00faltimos "+ Long.valueOf((long) (getNRepairBuilds() - cont)) + " builds han sido reparados en menos de "+getTimeRepairBuilds() +"min.";
+
+        if(existBuilds()){
+            sinContruccionRota = getDaysWithoutBrokenBuilds() + " d\u00edas sin construcci\u00f3n rota. ";
+        }else{
+            sinContruccionRota =" Sin builds realizados.";
+        }
+        mttr = "MTTR: " + getMttr() + " Tiempo medio de reparaci\u00f3n.";
+        mtbf = "MTBF: " + getMtbf() + " Tiempo medio entre aver\u00edas.";
+        mbbf = "MBBF: " + getMbbf() + " Media de builds entre fallos.";
+
+        array.add(rootImage+getGenerateWeather(result));//imagen
         array.add(tabla);//tabla
         array.add(cardTitle); //titulo con score
-        array.add(titlePractise); //titulo de la practica
-        array.add(String.valueOf((getNRepairBuilds() - cont))); //numero de builds que no superan el maximo
-        array.add(String.valueOf(getTimeRepairBuilds())); //tiempo maximo de reaparaciÃ³n
+        array.add(desc); //numero de builds que no superan el maximo + tiempo maximo de reaparaciÃ³n
+        array.add(String.valueOf(result));
+        array.add(sinContruccionRota);//sin contruccion rota-->pos 5
+        array.add(mttr);//mttr-->pos 6
+        array.add(mtbf);//mtbf-->pos 7
+        array.add(mbbf);//mbbf-->pos 8
+
+
         return array;
     }
 
@@ -333,24 +358,24 @@ public class ValidateMenuAction implements Action {
         List<String> lista = new ArrayList<String>();
         HealthReport report = project.getBuildHealth();
         String[] getImage= report.getIconClassName().split("-");
-        String icono = getImage[1]+"-"+getImage[2]+".gif";
         String tabla = "<div data-placement=\"right\"><table><thead><tr style=\"background: #fdffce;border: 2px solid #fcffc4;\"><th scope=\"col\">%</th><th scope=\"col\">Description</th></tr></thead><tbody><tr style=\"background: #ffffff;\"><td>"+report.getScore() +"</td><td>"+report.getDescription()+"</td></tr></tbody></table></div>";
-        String titlePractice ="Estatus del proyecto (Jenkins)";
-        lista.add(icono); //Nombre icono image
+        String cardTitle = report.getScore() +"% -- " + " Práctica 0: Estatus del proyecto (Jenkins) ";
+        String icon  = rootImage+getImage[1]+"-"+getImage[2]+".gif";
+        String text = report.getDescription();
+
+        lista.add(icon); //imagen
         lista.add(tabla); //tabla
+        lista.add(cardTitle); //titulo con score
+        lista.add(text); //numero de builds que no superan el maximo + tiempo maximo de reaparaciÃ³n
         lista.add(String.valueOf(report.getScore()));//score
-        lista.add(titlePractice);//Nombre de la practica
 
-
-        //  lista.add(String.valueOf(report.getScore())); //% weather
-        //   lista.add(report.getDescription()); //description
         return lista;
     }
 
     public String getMediaWeather(){
-        double p0 = Double.parseDouble(getStatusWeatherJenkins().get(2));
-        double p1 = Double.parseDouble(getViewSpeedRepairBuildStatus().get(2));
-        double p2 = Double.parseDouble(getViewSpeedBuildStatus().get(2));
+        long p0 = Long.parseLong(getStatusWeatherJenkins().get(4));
+        long p1 = Long.parseLong(getViewSpeedRepairBuildStatus().get(4));
+        long p2 = Long.parseLong(getViewSpeedBuildStatus().get(4));
         double sumTotal = (p0+p1+p2)/3;
         System.out.println("total" + sumTotal +"p0, p1, p2 : "+ p0 );
         String result = getGenerateWeather(sumTotal);

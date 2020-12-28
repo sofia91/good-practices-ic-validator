@@ -2,6 +2,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:bs="/bootstrap">
 
     <bs:layout title="Project Statistics" norefresh="false">
+
         <st:include it="${it.project}" page="sidepanel.jelly"/>
         <l:main-panel>
             <st:adjunct includes="io.jenkins.plugins.bootstrap4"/>
@@ -9,6 +10,7 @@
 <style>
 
  .tabs__panel-card {
+  background: #f1f1f1;
    display: -webkit-box;
    display: flex;
    margin-bottom: 30px;
@@ -16,12 +18,15 @@
    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
  }
  .tabs__panel-card:last-child {
+
    margin-bottom: 0;
  }
 
  .tabs__panel-card--spaced-between {
+
    -webkit-box-pack: justify;
            justify-content: space-between;
+
  }
 
  .tabs__panel-avatar {
@@ -54,7 +59,20 @@
  .link:hover {color:purple; text-decoration:underline;}
 
  </style>
-
+<div class="row py-3">
+    <div class="col">
+        <j:if test= "${it.maxTimeBuildValidate}">
+            <div class="alert alert-success" role="alert">
+                No ha superado el tiempo máximo de build, cumple las buenas prácticas de MF.<br/>
+            </div>
+        </j:if>
+        <j:if test= "${!it.maxTimeBuildValidate}">
+            <div class="alert alert-danger" role="alert">
+                El último build ha superado el tiempo máximo definido.
+            </div>
+        </j:if>
+    </div>
+</div>
 <div class="row">
   <div class="col-sm-12 mb-12 mb-md-12">
 	<svg width="100%" height="350" xmlns="http://www.w3.org/2000/svg" >
@@ -101,100 +119,74 @@
 	  <text font-weight="bold" font-style="italic" stroke="#000" transform="rotate(-1.420194387435913 410.0743103027389,215.89854431152477) matrix(0.6872081756591797,0,0,0.5350164175033569,126.27503696084023,37.54742428660393) " xml:space="preserve" text-anchor="start" font-family="Oswald, sans-serif" font-size="24" id="svg_4" y="341.58674" x="398.80014" stroke-width="0" fill="#000000">P6</text>
 	  <text font-style="italic" font-weight="bold" stroke="#000" transform="rotate(-1.420194387435913 375.25238037109494,215.2241363525378) matrix(0.6872081756591797,0,0,0.5350164175033569,126.27503696084023,37.54742428660393) " xml:space="preserve" text-anchor="start" font-family="Oswald, sans-serif" font-size="24" id="svg_45" y="340.32383" x="347.67252" stroke-width="0" fill="#000000">P7</text>
 	  <path stroke="#000" id="svg_47" d="m380.38237,156.47904l2.53263,-3.9338l4.38631,-2.27134l5.06528,0l4.38634,2.27134l2.53263,3.9338l0,4.54267l-2.53263,3.93377l-4.38634,2.27136l-5.06528,0l-4.38631,-2.27136l-2.53263,-3.93377l0,-4.54267z" stroke-opacity="null" fill="#b2b2b2"/>
-	  <img onClick="dataReception()"  tooltip="${it.statusWeatherJenkins[1]}" src="${rootURL}/static/c535d1a7/images/32x32/${it.statusWeatherJenkins[0]}" style="position: absolute;top: 6%; left: 46%;" class="link mensajeoculto" id="p0" />
-	  <img onClick="dataReception()"  tooltip="${it.viewSpeedRepairBuildStatus[1]}" src="${rootURL}/static/c535d1a7/images/32x32/${it.viewSpeedRepairBuildStatus[0]}" style="position: absolute;top: 70%; left: 47%" class="link" id="p1"/>
-	  <img onClick="dataReception()"  tooltip="${it.viewSpeedBuildStatus[1]}" src="${rootURL}/static/c535d1a7/images/32x32/${it.viewSpeedBuildStatus[0]}" style="position: absolute;top:6%; top: 70%; left: 40.5%;"  class="link" id="p2"/>
-	  <img class="rounded-circle " src="${rootURL}/static/c535d1a7/images/48x48/${it.mediaWeather}" style="background: #ffffff; position: absolute;top: 40%; left: 42%;" />
+
+	  <img onclick="dataReception('p0')" tooltip="${it.statusWeatherJenkins[1]}" src="${it.statusWeatherJenkins[0]}" style="position: absolute;top: 6%; left: 46%;" class="link" />
+	  <img onclick="dataReception('p6')" tooltip="${it.viewSpeedRepairBuildStatus[1]}" src="${it.viewSpeedRepairBuildStatus[0]}" style="position: absolute;top: 70%; left: 47%" class="link"/>
+	  <img onclick="dataReception('p7')" tooltip="${it.viewSpeedBuildStatus[1]}" src="${it.viewSpeedBuildStatus[0]}" style="position: absolute;top:6%; top: 70%; left: 39.50%;"  class="link"/>
+	  <img class="rounded-circle " src="${rootURL}/static/c535d1a7/images/48x48/${it.mediaWeather}" style="background: #ffffff; position: absolute;top: 40%; left: 42.50%;" />
+
 	</svg>
   </div>
 </div>
+ <script type="text/javascript">
+function dataReception(value){
 
-<script type="text/javascript">
-function dataReception(){
-      var contenedor = document.getElementById("enlace");
-      contenedor.style.display = "block";
+    var contenedor = document.getElementById("enlace");
+    var icon  = document.getElementById("weather");
+    var title = document.getElementById("title");
+    var text  = document.getElementById("text");
+    var supplementary1  = document.getElementById("supplementaryData1");
+    var supplementary2  = document.getElementById("supplementaryData2");
+
+    if( value =="p0"){
+        icon.src        = '${it.statusWeatherJenkins[0]}';
+        title.innerHTML ='${it.statusWeatherJenkins[2]}';
+        text.innerHTML  ='${it.statusWeatherJenkins[3]}';
+        supplementary1.innerHTML  ="";
+        supplementary2.innerHTML  ="";
+        contenedor.style.display = "block";
+    }
+    if( value =="p6"){
+        icon.src        ='${it.viewSpeedRepairBuildStatus[0]}';
+        title.innerHTML ='${it.viewSpeedRepairBuildStatus[2]}';
+        text.innerHTML  ='${it.viewSpeedRepairBuildStatus[3]}';
+        supplementary1.innerHTML  ='<div class="card-title" style="text-align: center;border: 1px solid white;padding:2%;background: #e6e6e6;">Datos complementarios.</div><div style="text-align: justify;padding-left: 3%"><p>${it.viewSpeedRepairBuildStatus[5]}<br/>${it.viewSpeedRepairBuildStatus[6]}<br/>${it.viewSpeedRepairBuildStatus[7]}<br/>${it.viewSpeedRepairBuildStatus[8]}</p><br/></div>';
+        supplementary2.innerHTML  ='<div class="card-title" style="text-align: center;border: 1px solid white;padding:2%;background: #e6e6e6;">Explicación</div><div style="text-align: justify;padding-left: 3%"> </div>';
+        contenedor.style.display = "block";
+    }
+    if( value =="p7"){
+        icon.src        = '${it.viewSpeedBuildStatus[0]}';
+        title.innerHTML ='${it.viewSpeedBuildStatus[2]}';
+        text.innerHTML  ='${it.viewSpeedBuildStatus[3]}';
+        supplementary1.innerHTML  ='<div class="card-title" style="text-align: center;border: 1px solid white;padding:2%;background: #e6e6e6;">Datos complementarios.</div><div style="text-align: justify;padding-left: 3%"><p>${it.viewSpeedBuildStatus[5]}<br/>${it.viewSpeedBuildStatus[6]}<br/>${it.viewSpeedBuildStatus[7]}<br/>${it.viewSpeedBuildStatus[8]}</p><br/></div>';
+        supplementary2.innerHTML  ='<div class="card-title" style="text-align: center;border: 1px solid white;padding:2%;background: #e6e6e6;">Explicación</div><div style="text-align: justify;padding-left: 3%"> </div>';
+        contenedor.style.display = "block";
+    }
 }
-</script>
-        <div  id="enlace"  style="display:none">
-        <div class="col-sm-6 col-md-12">
-        <div class="tabs__panel-card">
-             <img style="flex-shrink: 0;width: 80px;height: 72px;border-radius: 50%;background-color: rgb(2 26 53);" src="${rootURL}/static/c535d1a7/images/48x48/${it.viewSpeedRepairBuildStatus[0]}"/>
-             <div class="tabs__panel-content">
-               <h5 class="card-title"> ${it.dataReception[2]}% -- ${it.dataReception[3]}</h5>
-               Los últimos ${it.dataReception[4]} builds tardaron menos de ${it.dataReception[5]} minutos.<br/>
-             </div>
-        </div>
-        </div>
-        </div>
-            <div class="row py-3">
-                <div class="col">
-                    <j:if test= "${it.maxTimeBuildValidate}">
-                        <div class="alert alert-success" role="alert">
-                            No ha superado el tiempo máximo de build, cumple las buenas prácticas de MF.<br/>
-                        </div>
-                    </j:if>
-                    <j:if test= "${!it.maxTimeBuildValidate}">
-                        <div class="alert alert-danger" role="alert">
-                            El último build ha superado el tiempo máximo definido.
-                        </div>
-                    </j:if>
-                </div>
-            </div>
 
-            <div class="row">
-              <div class="col-sm-6 mb-3 mb-md-0">
-                <div class="card  border-success mb-3">
-                  <div class="card-body">
-                        <h5 class="card-title">Días sin construcción rota:
-                        <j:if test= "${!it.existBuilds}">
-                             <h3>${it.daysWithoutBrokenBuilds}</h3>
-                        </j:if>
-                        <j:if test= "${it.existBuilds}">
-                            Sin builds realizados.
-                        </j:if>
-                        </h5>
-                  </div>
-                </div>
-              </div>
-              <div class="col-sm-6">
-                <div class="card text-white bg-info mb-3">
-                  <div class="card-body">
-                    <h5 class="card-title"> Builds and  parameters</h5>
-                    <p class="card-text text-white">
-                      Tiempo último build: ${it.tiempo2} milisegundos.<br/>
-                      Tiempo máximo definido: ${it.maxTimeToBuild} minutos.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <br/>
-            <div class="row">
-              <div class="col-sm-12 mb-3 mb-md-0">
-                <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title">Métricas. </h5>
-                    <div class="row">
-                        <div class="col-sm-3 md-3 mb-md-0"><p class="card-text"> MTTR: ${it.mttr} </p></div>
-                        <div class="col-sm-3 md-3 mb-md-0"><p class="card-text"> MTBF: ${it.mtbf} </p></div>
-                        <div class="col-sm-3 md-3 mb-md-0"><p class="card-text"> MBBF: ${it.mbbf} </p></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <br/>
-            <div class="row">
-              <div class="col-sm-12 mb-6 mb-md-0">
-                <div class="card">
-                  <div class="card-body">
-                       <h5 class="card-title">Tiempos promedios. </h5>
-                        <div class="col-sm-6 md-6 mb-md-0"><p class="card-text">Tiempo medio de los últimos ${ it.lastNBuilds } builds:  ${it.averageLastNBuilds} </p></div>
-                        <div class="col-sm-6 md-6 mb-md-0"><p class="card-text">Tiempo medio de los builds exitosos:  ${it.averageAllSuccessBuilds}</p></div>
-                  </div>
-                </div>
-              </div>
-            </div>
+</script>
+    <div class="tabs__panel-card" id="enlace" style="display:none">
+      <div class="row">
+          <div class="col-2" style="padding:0 0 1% 4%;">
+             <img id="weather" src="" style="flex-shrink: 0;width: 80px;height: 80px;border-radius: 50%;background-color: rgb(2 26 53);"/>
+          </div>
+          <div class="col">
+             <div class="tabs__panel-content">
+               <h5 class="card-title" id="title" style="padding: 2%;"></h5>
+               <p id="text"></p><br/>
+             </div>
+          </div>
+        </div>
+        <br/>
+        <div class="row">
+          <div class="col-6">
+             <div class="tabs__panel-content" id="supplementaryData1" style="border: solid 1px #bfbfbf;background: #fff;"></div>
+          </div>
+          <div class="col-6">
+             <div  class="tabs__panel-content" id="supplementaryData2" style="border: solid 1px #bfbfbf;background: #fff;"> </div>
+          </div>
+        </div>
+    </div>
             </div>
         </l:main-panel>
     </bs:layout>
